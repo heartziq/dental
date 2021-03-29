@@ -1,0 +1,25 @@
+{
+    "results": [
+        {
+            "Id": 0, 
+            "Customer": "Edward Jones", 
+            "Doctor": "Milana K. Schmidt", 
+            "Time": "Mar 21, 2021 at 8:00am (SGT)", 
+            "Location": "Level 2, Room B" 
+        },
+        {
+            "Id": 1, 
+            "Customer": "Laura Graham", 
+            "Doctor": "Milana K. Schmidt", 
+            "Time": "Mar 21, 2021 at 9:00am (SGT)", 
+            "Location": "Level 3, Room A" 
+        },
+        {
+            "Id": 2, 
+            "Customer": "Christopher K", 
+            "Doctor": "Park Gi-reum", 
+            "Time": "Mar 22, 2021 at 8:00am (SGT)", 
+            "Location": "Level 2, Room C" 
+        }
+    ]
+}

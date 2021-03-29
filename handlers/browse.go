@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"dental/handlers/data"
 	"log"
 	"net/http"
 	"text/template"
@@ -21,6 +22,15 @@ func (i *Index) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	// retrieve user
 	if currentUser, exist := mapUsers[cookie.Value]; exist {
 		user = currentUser
+
+		// load appointments here
+		user.Appointments = []data.Appointment{}
+		data.B.List(data.RootNode, &user.Appointments)
+		if r.Method == http.MethodPost {
+			newName := r.FormValue("search")
+			user.Username = newName
+			mapUsers[cookie.Value] = user
+		}
 	} else {
 		// cookie exist but user not found
 		// reset cookie to prevent infinite redirect

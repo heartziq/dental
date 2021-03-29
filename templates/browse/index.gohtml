@@ -6,12 +6,16 @@
     </head>
     <body>
         <h1>Here are your appts, {{.Username}}</h1>
+        <form method="POST">
+            <input type="text" name="search" />
+            <input type="submit" />
+        </form>
+        
         <ul>
-            <li>1</li>
-            <li>2</li>
-            <li>3</li>
-            <li>2</li>
-            <li>3</li>
+        {{$Name := .Username}}
+        {{range .Appointments}}
+        {{$Name}}: <li>{{.Id}}, {{.Customer}}</li>
+        {{end}}
         </ul>
     </body>
 </html>

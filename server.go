@@ -5,6 +5,7 @@ import (
 	"text/template"
 
 	"dental/handlers"
+	_ "dental/handlers/data"
 )
 
 var (

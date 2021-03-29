@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"text/template"
 
+	"dental/handlers/data"
+
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -13,8 +15,9 @@ type Login struct {
 }
 
 type User struct {
-	Username string
-	Password string
+	Username     string
+	Password     string
+	Appointments []data.Appointment
 }
 
 var (
