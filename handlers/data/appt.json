@@ -1,5 +1,5 @@
 {
-    "results": [
+    "Edward": [
         {
             "Id": 0, 
             "Customer": "Edward Jones", 
@@ -17,6 +17,29 @@
         {
             "Id": 2, 
             "Customer": "Christopher K", 
+            "Doctor": "Park Gi-reum", 
+            "Time": "Mar 22, 2021 at 8:00am (SGT)", 
+            "Location": "Level 2, Room C" 
+        }
+    ],
+    "Sarah": [
+        {
+            "Id": 4, 
+            "Customer": "Finn Tutuala", 
+            "Doctor": "Milana K. Schmidt", 
+            "Time": "Mar 21, 2021 at 8:00am (SGT)", 
+            "Location": "Level 2, Room B" 
+        },
+        {
+            "Id": 5, 
+            "Customer": "Heather Locklear", 
+            "Doctor": "Milana K. Schmidt", 
+            "Time": "Mar 21, 2021 at 9:00am (SGT)", 
+            "Location": "Level 3, Room A" 
+        },
+        {
+            "Id": 6, 
+            "Customer": "John Osment", 
             "Doctor": "Park Gi-reum", 
             "Time": "Mar 22, 2021 at 8:00am (SGT)", 
             "Location": "Level 2, Room C" 

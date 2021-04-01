@@ -11,6 +11,9 @@ type Index struct {
 	Tpl *template.Template
 }
 
+// Handle Index provide info of already booked appointment
+// Customer will see their list of booked appointment
+// Admin will see the whole entire list (from all customers)
 func (i *Index) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	// if not logged in, redir to "/login"
 	cookie, err := r.Cookie("userInfo")
@@ -23,13 +26,23 @@ func (i *Index) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	if currentUser, exist := mapUsers[cookie.Value]; exist {
 		user = currentUser
 
-		// load appointments here
-		user.Appointments = []data.Appointment{}
-		data.B.List(data.RootNode, &user.Appointments)
+		// force privilege escalation
+		user.IsAdmin = true
+
+		if !user.IsAdmin {
+			// User load here
+			user.Appointments = data.ListOne(user.Username)
+		}
+
+		// only Admin can search
 		if r.Method == http.MethodPost {
+
 			newName := r.FormValue("search")
-			user.Username = newName
-			mapUsers[cookie.Value] = user
+			d := &data.Appointment{}
+			data.B.Search(&data.RootNode, newName, &d)
+
+			user.Appointments = []data.Appointment{*d}
+
 		}
 	} else {
 		// cookie exist but user not found

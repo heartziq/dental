@@ -2,24 +2,25 @@ package data
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
+	"strings"
 )
 
 var (
 	B             BST
 	RootNode      *Node
-	InsertCounter int = 0
+	InsertCounter int                      = 0
+	adminResult   map[string][]Appointment // for Admin
 )
 
-// for json unmarshalling
-type result struct {
-	Appt []Appointment `json:"results"`
-}
+// for json unmarshalling (for Customers)
+// type result struct {
+// 	Appt []Appointment `json:"results"`
+// }
 
 type Appointment struct {
-	Id       int
+	Id       string
 	Customer string
 	Doctor   string
 	Time     string
@@ -40,78 +41,86 @@ type BST struct {
 }
 
 func init() {
-	var r result
+	// var r result
 
 	content, err := os.ReadFile("handlers/data/appt.json")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-
-	json.Unmarshal(content, &r)
-	// fmt.Println(r.Appt[0])
+	// per user basis - only Admin will use BST algo
+	// json.Unmarshal(content, &r)
+	json.Unmarshal(content, &adminResult)
+	// fmt.Println(adminResult["Edward"])
 	// func(t **Node) {
 	// 	for _, appointment := range r.Appt {
 	// 		B.Insert(t, &appointment) // being &Root being 'captured'
 	// 	}
 	// }(&RootNode)
-
-	for i := 0; i < len(r.Appt); i++ {
-		B.Insert(&RootNode, &r.Appt[i])
+	for _, appointments := range adminResult {
+		for i := 0; i < len(appointments); i++ {
+			B.Insert(&RootNode, &appointments[i], "")
+		}
 	}
-
-	// B.Display(RootNode)
-	// var dAppt []Appointment
-	// B.List(RootNode, &dAppt)
-
-	// fmt.Println(dAppt)
 }
 
-func (b *BST) Insert(t **Node, a *Appointment) error {
-	// fmt.Println("=====================================")
-	// fmt.Printf("Insert: %d\n", InsertCounter)
-	// InsertCounter++
+func (b *BST) Insert(t **Node, a *Appointment, name string) error {
 
 	if *t == nil {
 		*t = &Node{
 			Item: a,
 		}
 
+		if name != "" {
+
+			adminResult[name] = append(adminResult[name], *a)
+
+		}
+
 		b.size++
 		return nil
 	}
-
-	if a.Customer < (*t).Item.Customer {
-		b.Insert(&((*t).Left), a)
+	if a.Customer <= (*t).Item.Customer {
+		b.Insert(&((*t).Left), a, name)
 	} else if a.Customer > (*t).Item.Customer {
-		b.Insert(&((*t).Right), a)
+		b.Insert(&((*t).Right), a, name)
 	}
 
 	return nil
 }
 
-func (b *BST) Search(r **Node, name string) (*Appointment, error) {
+func (b *BST) Search(r **Node, name string, a **Appointment) {
+
 	if *r == nil {
-		return nil, errors.New("no appointment been made yet")
+		return
 	}
 
-	if name == (*r).Item.Customer {
-		return (*r).Item, nil
+	// fmt.Printf("newName: %s\n", name)
+	// fmt.Printf("Item.Customer: %s\n", (*r).Item.Customer)
+
+	// fmt.Printf("newName == Item.Customer: %v\n", name == (*r).Item.Customer)
+	// fmt.Printf("newName == Item.Customer: %v\n", strings.Compare(name, (*r).Item.Customer))
+
+	if strings.Compare(name, (*r).Item.Customer) == 0 {
+		*a = (*r).Item
 	} else if name < (*r).Item.Customer {
-		b.Search(&((*r).Left), name)
+		b.Search(&((*r).Left), name, a)
 	} else {
-		b.Search(&((*r).Right), name)
+		b.Search(&((*r).Right), name, a)
 	}
-
-	return nil, errors.New("appointment not found")
-
 }
 
-func (b *BST) List(t *Node, l *[]Appointment) {
+// ListAll list all appointments made by all users (Admin Only)
+func (b *BST) ListAll(t *Node, l *[]Appointment) {
 	if t != nil {
 		*l = append(*l, *t.Item)
-		b.List(t.Left, l)
-		b.List(t.Right, l)
+		b.ListAll(t.Left, l)
+		b.ListAll(t.Right, l)
 	}
+}
+
+// ListOne list only 1 user's appointments
+func ListOne(cName string) []Appointment {
+	return adminResult[cName]
 }
 
 func (b *BST) Display(t *Node) {

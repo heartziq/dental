@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Book Appointments</title>        
+    </head>
+    <body>
+    {{if .Username}}
+        <h1>Welcome, {{.Username}}</h1>
+    {{end}}
+        <form method="POST">
+            <label for="start">Start date: </label>
+
+            <input type="date" id="start" name="appt-date"
+            value="{{.Start}}"
+            min="{{.Start}}" max="{{.End}}">
+
+            <label for="appt">Choose a time for your meeting:</label>
+
+            <input type="time" id="appt" name="appt-time"
+                min="08:00" max="19:00" step="3600" required>
+            <input type="submit" />
+            {{if .Appt}}
+                <p>{{.Appt}}</p>
+            {{else}}
+                <p>Only select hourly range <b>(minutes not accepted) </b><i>e.g. 8:00am, 12:00pm</i></p>
+                <p>8:31am, 12:45pm <- <b>not accepted</b> as each appointment is an hour</p>
+            {{end}}
+        </form>
+    </body>
+</html>

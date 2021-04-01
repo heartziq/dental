@@ -6,16 +6,25 @@
     </head>
     <body>
         <h1>Here are your appts, {{.Username}}</h1>
-        <form method="POST">
-            <input type="text" name="search" />
-            <input type="submit" />
-        </form>
+        {{if .IsAdmin}}
+            <form method="POST">
+                <label for="search">Customer name: </label>
+                <input type="text" name="search" />
+                <input type="submit" />
+            </form>
+        {{end}}
         
         <ul>
-        {{$Name := .Username}}
-        {{range .Appointments}}
-        {{$Name}}: <li>{{.Id}}, {{.Customer}}</li>
+
+        {{if not .Appointments}}
+            <p>NOthing</p>
+        {{else}}
+            {{range .Appointments}}
+                <li>{{.Id}}, {{.Customer}} @ {{.Location}}</li>
+            {{end}}
         {{end}}
+        
+
         </ul>
     </body>
 </html>

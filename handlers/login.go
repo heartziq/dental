@@ -15,9 +15,9 @@ type Login struct {
 }
 
 type User struct {
-	Username     string
-	Password     string
-	Appointments []data.Appointment
+	Username, Password string
+	IsAdmin            bool
+	Appointments       []data.Appointment
 }
 
 var (
@@ -47,6 +47,9 @@ func (l *Login) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		// insert new user
 		user.Username = r.FormValue("Username")
 		user.Password = r.FormValue("Password")
+
+		// admin flag
+		// user.IsAdmin = true
 
 		mapUsers[userCookie.Value] = user
 
