@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><title>Customer Registration</title><head>
+    <body>
+        <form method="POST">
+            <h1>Enter login details</h1>
+            <label for="username">User: </label>
+            <input type="text" id="username" value="{{.Username}}" name="Username">
+            <br>
+            <label for="password">Password: </label>
+            <input type="password" id="password" name="Password">
+            <br>
+            <label for="cpwd">Confirm Password: </label>
+            <input type="password" id="cpwd" name="ConfirmPassword">
+            {{if .Error}}
+                <p><i>{{.Error}}</i></p>
+            {{end}}
+            <br>
+            <input type="submit">
+        </form>
+    </body>
+</html>

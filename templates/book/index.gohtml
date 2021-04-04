@@ -5,6 +5,15 @@
         <title>Book Appointments</title>        
     </head>
     <body>
+
+    <a href="/">Home</a>
+    {{if .IsAdmin}}
+        <a href="/dashboard">Dashboard</a>
+    {{else}}
+        <a href="/book?username={{.Username}}">Book Appointment</a>
+
+    {{end}}
+    <a href="/logout">logout</a>
     {{if .Username}}
         <h1>Welcome, {{.Username}}</h1>
     {{end}}

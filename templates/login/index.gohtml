@@ -1,5 +1,25 @@
-{{template "header"}}
+    <!doctype html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Login</title>
+        </head>
     <body>
-        {{template "form"}}
+    {{if .Exist}}
+    <p>{{.Exist}}</p>
+    {{end}}
+    <form method="POST">
+        <h1>Enter login details</h1>
+        <label for="username">User: </label>
+        <input type="text" id="username" value="{{.Username}}" name="Username">
+        <br>
+        <label for="password">Password: </label>
+        <input type="password" id="password" name="Password">
+        <br>
+        <input type="submit">
+    </form>
+        {{if .Error}}
+            <p><i>{{.Error}}</i></p>
+        {{end}}
     </body>
 </html>

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"text/template"
 
-	"dental/handlers/data"
+	"dental/helper"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -14,53 +14,70 @@ type Login struct {
 	Tpl *template.Template
 }
 
-type User struct {
-	Username, Password string
-	IsAdmin            bool
-	Appointments       []data.Appointment
-}
-
-var (
-	user     User = User{}
-	mapUsers      = map[string]User{} // key is session
-)
-
-func (l *Login) HandleLogin(w http.ResponseWriter, r *http.Request) {
-
-	// if cookie exist, redir to /
-	_, err := r.Cookie("userInfo")
-	if err == nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
+func (l *Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	message := ""
+	username := r.URL.Query().Get("username")
+	var userAlreadyExist string
+	if r.URL.Query().Get("exist") == "true" {
+		userAlreadyExist = "User already exist, pls login"
 	}
+	log.Println(username)
 
 	if r.Method == http.MethodPost {
-		// set cookie
-		id := uuid.NewV4()
-		userCookie := &http.Cookie{
-			Name:  "userInfo",
-			Value: id.String(),
+		username = r.FormValue("Username")
+
+		user, err := helper.GetUser(username)
+
+		// if user not found, register first
+		if err != nil {
+			log.Println(err.Error())
+			http.Redirect(w, r, "/register?username="+username, http.StatusSeeOther)
+			return
 		}
 
-		http.SetCookie(w, userCookie)
+		// proceed with auth
+		r.SetBasicAuth(username, r.FormValue("Password"))
 
-		// insert new user
-		user.Username = r.FormValue("Username")
-		user.Password = r.FormValue("Password")
+		_, p, ok := r.BasicAuth()
 
-		// admin flag
-		// user.IsAdmin = true
+		if ok {
+			// auth successful
+			if p == user.Password {
+				// set cookie
+				id := uuid.NewV4()
+				userCookie := &http.Cookie{
+					Name:  "userInfo",
+					Value: id.String(),
+				}
 
-		mapUsers[userCookie.Value] = user
+				http.SetCookie(w, userCookie)
+				// update session and redirect to /browse
+				helper.UpdateSession(user.Username, userCookie.Value)
+				http.Redirect(w, r, "/browse", http.StatusSeeOther)
+				return
+			} else {
+				log.Println("p not = user.Password")
+				message = "Wrong Password"
+			}
 
-		// load /
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		}
 
 	}
 
-	// GET method with No Cookie? Load empty user{}
-	err = l.Tpl.ExecuteTemplate(w, "index.gohtml", user)
+	log.Printf("message: %s\t[login.go, 72]\n", message)
+
+	// GET method
+	err := l.Tpl.ExecuteTemplate(w, "index.gohtml", struct {
+		Error    string
+		Username string
+		Exist    string
+	}{
+		message,
+		username,
+		userAlreadyExist,
+	})
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
 }

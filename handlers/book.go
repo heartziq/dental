@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"dental/handlers/data"
+	"dental/helper"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -32,14 +33,13 @@ type date struct {
 	Time  string
 }
 
-func (b *Book) HandleBook(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("userInfo")
-	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-	currentUser, exist := mapUsers[cookie.Value]
-	if exist {
+func (b *Book) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	username := r.URL.Query().Get("username")
+	// currentUser, exist := userDB[cookie.Value]
+	user, err := helper.GetUser(username)
+	log.Printf("user: %v\t[book.go, 40]\n", user)
+
+	if err == nil {
 		// fmt.Println(currentUser)
 		start := time.Now().Format("2006-01-02")                         // yyyy-dd-mm
 		end := time.Now().Add(time.Hour * 24 * 182).Format("2006-01-02") // approx 6 months.
@@ -66,15 +66,13 @@ func (b *Book) HandleBook(w http.ResponseWriter, r *http.Request) {
 
 			newAppt := data.Appointment{
 				Id:       uuid.NewV4().String(),
-				Customer: currentUser.Username,
+				Customer: user.Username,
 				Doctor:   "Kestart D",
 				Time:     newDate.Appt,
 				Location: "Wing A, Level 3",
 			}
 
-			data.B.Insert(&data.RootNode, &newAppt, currentUser.Username)
-			fmt.Println("Book.go")
-			data.B.Display(data.RootNode)
+			data.B.Insert(&data.RootNode, &newAppt, user.Username)
 
 			err = b.Tpl.ExecuteTemplate(w, "redir.gohtml", struct {
 				Seconds int
@@ -90,24 +88,24 @@ func (b *Book) HandleBook(w http.ResponseWriter, r *http.Request) {
 
 		}
 	} else {
-		cookie.MaxAge = -1
-		http.SetCookie(w, cookie)
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		// cookie.MaxAge = -1
+		// http.SetCookie(w, cookie)
+		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
 	}
-
-	fmt.Println("After block: ", currentUser.Username)
 
 	err = b.Tpl.ExecuteTemplate(w, "index.gohtml", struct {
 		Start    string
 		End      string
 		Appt     string
 		Username string
+		IsAdmin  bool
 	}{
 		newDate.Start,
 		newDate.End,
 		newDate.Appt,
-		currentUser.Username,
+		user.Username,
+		user.IsAdmin,
 	})
 
 	if err != nil {

@@ -5,6 +5,14 @@
         <title>Browse Appointments</title>
     </head>
     <body>
+
+    <a href="/">Home</a>
+    {{if .IsAdmin}}
+        <a href="/dashboard">Dashboard</a>
+            {{else}}
+        <a href="/book?username={{.Username}}">Book Appointment</a>
+    {{end}}
+    <a href="/logout">logout</a>
         <h1>Here are your appts, {{.Username}}</h1>
         {{if .IsAdmin}}
             <form method="POST">
@@ -15,16 +23,21 @@
         {{end}}
         
         <ul>
-
-        {{if not .Appointments}}
-            <p>NOthing</p>
-        {{else}}
-            {{range .Appointments}}
-                <li>{{.Id}}, {{.Customer}} @ {{.Location}}</li>
+            {{if not .IsAdmin}}
+                <a href="/book?username={{.Username}}">Book Appointment</a>
             {{end}}
-        {{end}}
-        
-
+            {{if not .Appointments}}
+                {{if not .IsAdmin}}
+                    <p>You have no active appointment</p>
+                {{else}}
+                    <p>Appointment not found</p>
+                {{end}}
+            {{else}}
+            <p>You have appointment with:</p>
+                {{range .Appointments}}
+                    <li>with Dr. {{.Doctor}} @{{.Time}}, Venue: {{.Location}}</li>
+                {{end}}
+            {{end}}
         </ul>
     </body>
 </html>

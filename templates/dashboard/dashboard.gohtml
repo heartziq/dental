@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>Dashboard - User Management</title>
+    </head>
+    <body>
+
+    <a href="/">Home</a>
+    
+    <a href="/logout">logout</a>
+    <br>
+        {{if .UserList}}
+            {{range .UserList}}
+                <a href="/dashboard?username={{.}}">{{.}}</a>
+                <br>
+            {{end}}
+            {{else}}
+            <p>no registered user yet - Nothing to delete</p>
+        {{end}}
+    </body>
+</html>
