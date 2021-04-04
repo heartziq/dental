@@ -9,8 +9,11 @@ import (
 	"log"
 )
 
+// GetUser retrieve a user based on username provided as param
+// if user does not exist,
+// error "user not found" will be return alongside a nil obj
+//
 func GetUser(username string) (*data.User, error) {
-	// fmt.Println(username, data.UserDB["tarar@aol.com"])
 	user, exist := data.UserDB[username]
 
 	if !exist {
@@ -21,8 +24,10 @@ func GetUser(username string) (*data.User, error) {
 
 }
 
+// GetAllUser will retrieve all registered user as a slice (except admin)
+//
 func GetAllUser() (u []string) {
-	for key, _ := range data.UserDB {
+	for key := range data.UserDB {
 		if key == "admin" {
 			continue
 		}
@@ -32,19 +37,17 @@ func GetAllUser() (u []string) {
 	return
 }
 
-func DisplayAllSession() {
-	fmt.Println(data.SessionToUsername)
-}
-
-// to register new user
+// AddUser adds new user account to UserDB
+// The 2nd arg 'pwd' will be the user's password
 func AddUser(username string, pwd string) {
 	data.UserDB[username] = data.User{
 		Username: username,
 		Password: pwd,
 	}
-	// log.Println(data.UserDB)
 }
 
+// SessionExist verify if session is in map
+// Returns true if exist, false otherwise
 func SessionExist(session string) bool {
 	_, exist := data.SessionToUsername[session]
 
@@ -53,16 +56,18 @@ func SessionExist(session string) bool {
 
 func IsLoggedIn(username string, session string) bool {
 
-	if data.UsernameToSession[username] == session {
-		return true
-	}
-	return false
+	return data.UsernameToSession[username] == session
 }
 
 func DeleteUser(username string) bool {
 	_, exist := data.UserDB[username]
 	if exist {
 		delete(data.UserDB, username)
+		e, err := json.Marshal(data.UserDB)
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+		ioutil.WriteFile("handlers/data/user.json", e, 0644)
 		return true
 	}
 	return exist
@@ -92,7 +97,19 @@ func UpdateSession(username, session string) {
 func Logout(session string) {
 	username := data.SessionToUsername[session]
 	delete(data.SessionToUsername, session)
+
+	// set to empty session
 	data.UsernameToSession[username] = ""
+
+	// Update
+	b, err := json.Marshal(data.SessionToUsername)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+
+	log.Println(string(b), "-----------> [helper.go, 103]")
+	ioutil.WriteFile("handlers/data/session.json", b, 0644)
+
 }
 
 func GetNameBySession(session string) string {

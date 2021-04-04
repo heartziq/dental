@@ -8,8 +8,6 @@ import (
 	"dental/handlers"
 )
 
-// GET json path
-
 var (
 	login     *handlers.Login        = &handlers.Login{}
 	logout    *handlers.Logout       = &handlers.Logout{}
@@ -29,7 +27,7 @@ func init() {
 
 }
 
-func exampleMiddleware(next http.Handler) http.Handler {
+func VerifyLoggedIn(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// if no cookie, set cookie
 		_, err := r.Cookie("userInfo")
@@ -62,12 +60,12 @@ func main() {
 	customMux := http.NewServeMux()
 
 	// Set Routers
-	customMux.Handle("/", exampleMiddleware(index))
-	customMux.Handle("/login", exampleMiddleware(login))
-	customMux.Handle("/register", exampleMiddleware(register))
-	customMux.Handle("/book", exampleMiddleware(book))
-	customMux.Handle("/logout", exampleMiddleware(logout))
-	customMux.Handle("/dashboard", exampleMiddleware(dashboard))
+	customMux.Handle("/", VerifyLoggedIn(index))
+	customMux.Handle("/login", VerifyLoggedIn(login))
+	customMux.Handle("/register", VerifyLoggedIn(register))
+	customMux.Handle("/book", VerifyLoggedIn(book))
+	customMux.Handle("/logout", VerifyLoggedIn(logout))
+	customMux.Handle("/dashboard", VerifyLoggedIn(dashboard))
 
 	customMux.Handle("/favicon.ico", http.NotFoundHandler())
 
@@ -75,5 +73,4 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	// http.ListenAndServe(":8080", customMux)
 }

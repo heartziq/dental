@@ -27,6 +27,7 @@ func init() {
 
 	json.Unmarshal(content, &SessionToUsername)
 
+	// load previously stored user db
 	content, err = os.ReadFile("handlers/data/user.json")
 	if err != nil {
 		log.Println(err.Error())

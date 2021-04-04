@@ -10,7 +10,7 @@
     {{if .IsAdmin}}
         <a href="/dashboard">Dashboard</a>
             {{else}}
-        <a href="/book?username={{.Username}}">Book Appointment</a>
+        <a href="/book">Book Appointment</a>
     {{end}}
     <a href="/logout">logout</a>
         <h1>Here are your appts, {{.Username}}</h1>
@@ -24,7 +24,7 @@
         
         <ul>
             {{if not .IsAdmin}}
-                <a href="/book?username={{.Username}}">Book Appointment</a>
+                <a href="/book">Book Appointment</a>
             {{end}}
             {{if not .Appointments}}
                 {{if not .IsAdmin}}
@@ -35,7 +35,7 @@
             {{else}}
             <p>You have appointment with:</p>
                 {{range .Appointments}}
-                    <li>with Dr. {{.Doctor}} @{{.Time}}, Venue: {{.Location}}</li>
+                    <li><span style="color:blue;font-weight:bold">{{.Customer}}</span> have appointment with Dr. <span style="color:green;font-weight:bold">{{.Doctor}}</span> @ <span style="font-weight:bold">{{.Time}}</span>, Venue: <span style="font-weight:bold">{{.Location}}</span></li>
                 {{end}}
             {{end}}
         </ul>

@@ -14,11 +14,6 @@ var (
 	adminResult   map[string][]Appointment // for Admin
 )
 
-// for json unmarshalling (for Customers)
-// type result struct {
-// 	Appt []Appointment `json:"results"`
-// }
-
 type Appointment struct {
 	Id       string
 	Customer string
@@ -41,21 +36,13 @@ type BST struct {
 }
 
 func init() {
-	// var r result
 
 	content, err := os.ReadFile("handlers/data/appt.json")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	// per user basis - only Admin will use BST algo
-	// json.Unmarshal(content, &r)
+
 	json.Unmarshal(content, &adminResult)
-	// fmt.Println(adminResult["Edward"])
-	// func(t **Node) {
-	// 	for _, appointment := range r.Appt {
-	// 		B.Insert(t, &appointment) // being &Root being 'captured'
-	// 	}
-	// }(&RootNode)
 	for _, appointments := range adminResult {
 		for i := 0; i < len(appointments); i++ {
 			B.Insert(&RootNode, &appointments[i], "")
@@ -94,12 +81,6 @@ func (b *BST) Search(r **Node, name string, a **Appointment) {
 		return
 	}
 
-	// fmt.Printf("newName: %s\n", name)
-	// fmt.Printf("Item.Customer: %s\n", (*r).Item.Customer)
-
-	// fmt.Printf("newName == Item.Customer: %v\n", name == (*r).Item.Customer)
-	// fmt.Printf("newName == Item.Customer: %v\n", strings.Compare(name, (*r).Item.Customer))
-
 	if strings.Compare(name, (*r).Item.Customer) == 0 {
 		*a = (*r).Item
 	} else if name < (*r).Item.Customer {
@@ -123,10 +104,10 @@ func ListOne(cName string) []Appointment {
 	return adminResult[cName]
 }
 
-func (b *BST) Display(t *Node) {
+func (b *BST) Display(t *Node, a *[]Appointment) {
 	if t != nil {
-		fmt.Println(t.Item)
-		b.Display(t.Left)
-		b.Display(t.Right)
+		*a = append(*a, *t.Item)
+		b.Display(t.Left, a)
+		b.Display(t.Right, a)
 	}
 }
