@@ -69,6 +69,7 @@ func main() {
 
 	customMux.Handle("/favicon.ico", http.NotFoundHandler())
 
+	// changes - now support https
 	if err := http.ListenAndServeTLS(":5221", "cert/cert.pem", "cert/key.pem", customMux); err != nil {
 		log.Fatal(err.Error())
 	}
