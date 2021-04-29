@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
 	"time"
 
 	"dental/handlers/data"

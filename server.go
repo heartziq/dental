@@ -1,9 +1,9 @@
 package main
 
 import (
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
 
 	"dental/handlers"
 )
@@ -69,7 +69,7 @@ func main() {
 
 	customMux.Handle("/favicon.ico", http.NotFoundHandler())
 
-	if err := http.ListenAndServe(":8080", customMux); err != nil {
+	if err := http.ListenAndServeTLS(":5221", "cert/cert.pem", "cert/key.pem", customMux); err != nil {
 		log.Fatal(err.Error())
 	}
 

@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"dental/helper"
+	"html/template"
 	"net/http"
-	"text/template"
 )
 
 type Logout struct {

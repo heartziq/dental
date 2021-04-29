@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"dental/helper"
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
 
 	uuid "github.com/satori/go.uuid"
 )

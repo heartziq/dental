@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
 
 	"dental/helper"
 
@@ -57,7 +57,7 @@ func (l *Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			} else {
 				log.Println("p not = user.Password")
-				message = "Wrong Password"
+				message = "Wrong Username/Password Combination"
 			}
 
 		}
