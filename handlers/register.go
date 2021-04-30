@@ -3,14 +3,28 @@ package handlers
 import (
 	"database/sql"
 	"dental/helper"
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
+
+	_ "github.com/go-sql-driver/mysql"
 )
+
+var (
+	// load db
+	conn   *sql.DB
+	sqlErr error
+)
+
+func init() {
+	conn, sqlErr = sql.Open("mysql", "user1:password@tcp(127.0.0.1:3306)/MYSTOREDB")
+	if sqlErr != nil {
+		log.Println(sqlErr.Error())
+	}
+}
 
 type Register struct {
 	Tpl *template.Template
@@ -25,27 +39,6 @@ func createPassword(password string) []byte {
 	}
 }
 
-func insertRecord(db *sql.DB, username, password string) int {
-	pwd := createPassword(password)
-	results, err := db.Exec("INSERT INTO MYSTOREDB.Users VALUES (?, ?)",
-
-		username, pwd)
-
-	if err != nil {
-
-		//panic(err.Error())
-		return 0
-
-	} else {
-
-		rows, _ := results.RowsAffected()
-
-		fmt.Println(rows)
-		return 1
-
-	}
-}
-
 func (reg *Register) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var message string
 	username := r.URL.Query().Get("username")
@@ -53,9 +46,10 @@ func (reg *Register) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		message = "user not found, please register first"
 	}
 	if r.Method == http.MethodPost {
+
 		// check if user exist
 		username = r.FormValue("Username")
-		_, err := helper.GetUser(username)
+		_, err := helper.GetUser(conn, username)
 		if err == nil {
 			// user exist
 			log.Println("user exist - redirect to /login")
@@ -71,8 +65,9 @@ func (reg *Register) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else {
 			if pwd == cPwd {
 				// cookie, _ := r.Cookie("userInfo")
-				helper.AddUser(username, pwd)
+				// helper.AddUser(username, pwd)
 				// no cookie here - hence nil derefer
+				helper.InsertRecord(conn, username, pwd, false)
 				// set cookie
 				id := uuid.NewV4()
 				userCookie := &http.Cookie{
@@ -92,7 +87,7 @@ func (reg *Register) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	err := reg.Tpl.ExecuteTemplate(w, "index.gohtml", struct {
 		Error    string
-		Username string
+		UserName string
 	}{
 		message,
 		username,

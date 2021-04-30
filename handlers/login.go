@@ -24,9 +24,11 @@ func (l *Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println(username)
 
 	if r.Method == http.MethodPost {
+		// access conn from here
+
 		username = r.FormValue("Username")
 
-		user, err := helper.GetUser(username)
+		user, err := helper.GetUser(conn, username)
 
 		// if user not found, register first
 		if err != nil {
@@ -35,24 +37,44 @@ func (l *Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// proceed with auth
-		r.SetBasicAuth(username, r.FormValue("Password"))
+		userInputPwd := r.FormValue("Password")
 
-		_, p, ok := r.BasicAuth()
+		// proceed with auth
+		r.SetBasicAuth(username, userInputPwd)
+
+		_, _, ok := r.BasicAuth()
 
 		if ok {
 			// auth successful
-			if p == user.Password {
-				// set cookie
+			// if p == user.Password {
+			// 	// set cookie
+			// 	id := uuid.NewV4()
+			// 	userCookie := &http.Cookie{
+			// 		Name:  "userInfo",
+			// 		Value: id.String(),
+			// 	}
+
+			// 	http.SetCookie(w, userCookie)
+			// 	// update session and redirect to /browse
+			// 	helper.UpdateSession(user.UserName, userCookie.Value)
+			// 	http.Redirect(w, r, "/browse", http.StatusSeeOther)
+			// 	return
+			// }
+
+			isCorrectPwd := helper.VerifyPassword([]byte(user.Password), userInputPwd)
+
+			if isCorrectPwd {
 				id := uuid.NewV4()
 				userCookie := &http.Cookie{
 					Name:  "userInfo",
 					Value: id.String(),
 				}
 
+				log.Printf("[login] Login passed: Isadmin: %v\n", user.IsAdmin)
+
 				http.SetCookie(w, userCookie)
 				// update session and redirect to /browse
-				helper.UpdateSession(user.Username, userCookie.Value)
+				helper.UpdateSession(user.UserName, userCookie.Value)
 				http.Redirect(w, r, "/browse", http.StatusSeeOther)
 				return
 			} else {
@@ -69,7 +91,7 @@ func (l *Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// GET method
 	err := l.Tpl.ExecuteTemplate(w, "index.gohtml", struct {
 		Error    string
-		Username string
+		UserName string
 		Exist    string
 	}{
 		message,

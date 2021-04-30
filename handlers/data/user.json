@@ -1,1 +1,1 @@
-{"Hadziq":{"Username":"Hadziq","Password":"123","IsAdmin":false,"Appointments":null},"admin":{"Username":"admin","Password":"123","IsAdmin":true,"Appointments":null},"zah":{"Username":"zah","Password":"4444","IsAdmin":false,"Appointments":null}}
+{"Hadziq":{"UserName":"Hadziq","Password":"123","IsAdmin":false,"Appointments":null},"admin":{"UserName":"admin","Password":"123","IsAdmin":true,"Appointments":null}}

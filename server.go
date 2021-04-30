@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	// Load handlers
 	login     *handlers.Login        = &handlers.Login{}
 	logout    *handlers.Logout       = &handlers.Logout{}
 	index     *handlers.Index        = &handlers.Index{}
@@ -24,7 +25,6 @@ func init() {
 	book.Tpl = template.Must(template.ParseGlob("templates/book/*"))
 	register.Tpl = template.Must(template.ParseGlob("templates/register/*"))
 	dashboard.Tpl = template.Must(template.ParseGlob("templates/dashboard/*"))
-
 }
 
 func VerifyLoggedIn(next http.Handler) http.Handler {
@@ -58,6 +58,10 @@ func VerifyLoggedIn(next http.Handler) http.Handler {
 func main() {
 
 	customMux := http.NewServeMux()
+	// conn, sqlErr = sql.Open("mysql", "user1:password@tcp(127.0.0.1:3306)/MYSTOREDB")
+	// if sqlErr != nil {
+	// 	log.Println("cant open sql")
+	// }
 
 	// Set Routers
 	customMux.Handle("/", VerifyLoggedIn(index))
@@ -68,6 +72,14 @@ func main() {
 	customMux.Handle("/dashboard", VerifyLoggedIn(dashboard))
 
 	customMux.Handle("/favicon.ico", http.NotFoundHandler())
+
+	// customMux.HandleFunc("/test", func (w http.ResponseWriter, r *http.Request) {
+	// 	VerifyLoggedIn(w, r, conn)
+	// }).Method("GET")
+
+	// customMux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+
+	// })
 
 	// changes - now support https
 	if err := http.ListenAndServeTLS(":5221", "cert/cert.pem", "cert/key.pem", customMux); err != nil {

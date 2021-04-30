@@ -42,7 +42,7 @@ func (b *Book) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 		return
 	}
-	user, err := helper.GetUser(username)
+	user, err := helper.GetUser(conn, username) // wire up to db as well
 	log.Printf("[/book] username: %s\tuser: %v\n", username, user)
 	if err == nil {
 		start := time.Now().Format("2006-01-02")                         // yyyy-dd-mm
@@ -68,13 +68,13 @@ func (b *Book) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			newAppt := data.Appointment{
 				Id:       uuid.NewV4().String(),
-				Customer: user.Username,
+				Customer: user.UserName,
 				Doctor:   "Kestart D",
 				Time:     newDate.Appt,
 				Location: "Wing A, Level 3",
 			}
 
-			data.B.Insert(&data.RootNode, &newAppt, user.Username)
+			data.B.Insert(&data.RootNode, &newAppt, user.UserName)
 
 			err = b.Tpl.ExecuteTemplate(w, "redir.gohtml", struct {
 				Seconds int
@@ -95,13 +95,13 @@ func (b *Book) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Start    string
 		End      string
 		Appt     string
-		Username string
+		UserName string
 		IsAdmin  bool
 	}{
 		newDate.Start,
 		newDate.End,
 		newDate.Appt,
-		user.Username,
+		user.UserName,
 		user.IsAdmin,
 	})
 

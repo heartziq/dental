@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	Username, Password string
+	UserName, Password string
 	IsAdmin            bool
 	Appointments       []Appointment
 }

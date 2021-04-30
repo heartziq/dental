@@ -20,7 +20,9 @@ func (i *Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	cookie, _ := r.Cookie("userInfo")
 
 	username := helper.GetNameBySession(cookie.Value)
-	user, err := helper.GetUser(username)
+	log.Printf(".GetNameBySession -> %v\n", username)
+	user, err := helper.GetUser(conn, username)
+	log.Printf(".GetUser -> %v\n", user)
 
 	if err == nil {
 
@@ -30,7 +32,7 @@ func (i *Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		if !user.IsAdmin {
 			// User load here
-			user.Appointments = data.ListOne(user.Username)
+			user.Appointments = data.ListOne(user.UserName)
 		} else {
 
 			// display all appointments
