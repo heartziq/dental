@@ -26,6 +26,22 @@ func VerifyPassword(hashedPassword []byte, password string) bool {
 	}
 }
 
+func DeleteUser(db *sql.DB, username string) (bool, error) {
+	results, err := db.Exec("DELETE FROM Users WHERE UserName=?;", username)
+	if err != nil {
+		return false, errors.New("Error deleting record")
+	}
+
+	rows, _ := results.RowsAffected()
+	fmt.Println(rows)
+	if rows < 1 {
+		return false, errors.New("record not foudn")
+	}
+
+	return true, nil
+
+}
+
 //
 func GetUser(db *sql.DB, username string) (*data.User, error) {
 	// user, exist := data.UserDB[username]
@@ -96,14 +112,41 @@ func InsertRecord(db *sql.DB, username, password string, isAdmin bool) int {
 
 // GetAllUser will retrieve all registered user as a slice (except admin)
 //
-func GetAllUser() (u []string) {
-	for key := range data.UserDB {
-		if key == "admin" {
-			continue
-		}
-		u = append(u, key)
+// func GetAllUser() (u []string) {
+// 	for key := range data.UserDB {
+// 		if key == "admin" {
+// 			continue
+// 		}
+// 		u = append(u, key)
+// 	}
+
+// 	return
+// }
+
+func GetAllUser(db *sql.DB) (users []string) {
+	// disable admin from being listed as
+	// users to be removed
+	userNotIncluded := "admin"
+	res, err := db.Query("Select UserName FROM MYSTOREDB.Users WHERE UserName <> ?", userNotIncluded)
+	if err != nil {
+		log.Println(err)
+		return nil
 	}
 
+	for res.Next() {
+		// map this type to the record in the table
+		var user data.User
+		err = res.Scan(&user.UserName)
+
+		if err != nil {
+			// panic(err.Error())
+			log.Println("error scanning")
+			return nil
+		}
+
+		// fmt.Println(user.UserName, user.Password)
+		users = append(users, user.UserName)
+	}
 	return
 }
 
@@ -129,19 +172,19 @@ func IsLoggedIn(username string, session string) bool {
 	return data.UsernameToSession[username] == session
 }
 
-func DeleteUser(username string) bool {
-	_, exist := data.UserDB[username]
-	if exist {
-		delete(data.UserDB, username)
-		e, err := json.Marshal(data.UserDB)
-		if err != nil {
-			fmt.Println("error:", err)
-		}
-		ioutil.WriteFile("handlers/data/user.json", e, 0644)
-		return true
-	}
-	return exist
-}
+// func DeleteUser(username string) bool {
+// 	_, exist := data.UserDB[username]
+// 	if exist {
+// 		delete(data.UserDB, username)
+// 		e, err := json.Marshal(data.UserDB)
+// 		if err != nil {
+// 			fmt.Println("error:", err)
+// 		}
+// 		ioutil.WriteFile("handlers/data/user.json", e, 0644)
+// 		return true
+// 	}
+// 	return exist
+// }
 
 func UpdateSession(username, session string) {
 	data.UsernameToSession[username] = session

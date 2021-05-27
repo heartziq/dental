@@ -29,7 +29,7 @@ type Node struct {
 	Left  *Node
 }
 
-// bst
+// BST keeps track of the whole Binary Search Tree
 type BST struct {
 	Root *Node
 	size int

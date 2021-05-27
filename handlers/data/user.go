@@ -19,7 +19,7 @@ var (
 )
 
 func init() {
-	// load previously stored user session
+	// pre-load previously stored user session
 	content, err := os.ReadFile("handlers/data/session.json")
 	if err != nil {
 		log.Println(err.Error())
@@ -27,7 +27,7 @@ func init() {
 
 	json.Unmarshal(content, &SessionToUsername)
 
-	// load previously stored user db
+	// pre-load previously stored user db
 	content, err = os.ReadFile("handlers/data/user.json")
 	if err != nil {
 		log.Println(err.Error())

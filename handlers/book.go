@@ -42,7 +42,7 @@ func (b *Book) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 		return
 	}
-	user, err := helper.GetUser(conn, username) // wire up to db as well
+	user, err := helper.GetUser(conn, username)
 	log.Printf("[/book] username: %s\tuser: %v\n", username, user)
 	if err == nil {
 		start := time.Now().Format("2006-01-02")                         // yyyy-dd-mm

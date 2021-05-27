@@ -21,10 +21,10 @@ func (cp *ControlPanel) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	username := r.URL.Query().Get("username")
-	var userList = []string{}
-	helper.DeleteUser(username)
+	// var userList = []{}
+	helper.DeleteUser(conn, username)
 	// list all
-	userList = helper.GetAllUser()
+	userList := helper.GetAllUser(conn)
 
 	err := cp.Tpl.ExecuteTemplate(w, "dashboard.gohtml", struct {
 		UserList []string

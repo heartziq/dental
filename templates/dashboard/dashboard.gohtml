@@ -12,7 +12,8 @@
     <br>
         {{if .UserList}}
             {{range .UserList}}
-                <a href="/dashboard?username={{.}}">{{.}}</a>
+                <span>{{.}}</span>
+                <a href="/dashboard?username={{.}}">Delete</a>
                 <br>
             {{end}}
             {{else}}

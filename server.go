@@ -2,8 +2,10 @@ package main
 
 import (
 	"html/template"
+	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"dental/handlers"
 )
@@ -16,6 +18,10 @@ var (
 	book      *handlers.Book         = &handlers.Book{}
 	register  *handlers.Register     = &handlers.Register{}
 	dashboard *handlers.ControlPanel = &handlers.ControlPanel{}
+
+	// Load loggers
+	Info  *log.Logger
+	Error *log.Logger
 )
 
 func init() {
@@ -25,6 +31,31 @@ func init() {
 	book.Tpl = template.Must(template.ParseGlob("templates/book/*"))
 	register.Tpl = template.Must(template.ParseGlob("templates/register/*"))
 	dashboard.Tpl = template.Must(template.ParseGlob("templates/dashboard/*"))
+
+	// Set up output file
+	var f *os.File
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("Recovered from panic")
+			path, _ := os.Getwd()
+			f, _ = os.Create(path + "/error.log")
+		}
+	}()
+	// f = loadFile("logger/errors.log") // to simulate panic recovery
+	f = loadFile("errors.log")
+	//
+	Info = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	Error = log.New(io.MultiWriter(os.Stdout, f), "Error: ", log.Ldate|log.Ltime|log.Lshortfile)
+}
+
+func loadFile(path string) *os.File {
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+
+	if err != nil {
+		panic("directory not found")
+	}
+
+	return f
 }
 
 func VerifyLoggedIn(next http.Handler) http.Handler {
@@ -58,10 +89,6 @@ func VerifyLoggedIn(next http.Handler) http.Handler {
 func main() {
 
 	customMux := http.NewServeMux()
-	// conn, sqlErr = sql.Open("mysql", "user1:password@tcp(127.0.0.1:3306)/MYSTOREDB")
-	// if sqlErr != nil {
-	// 	log.Println("cant open sql")
-	// }
 
 	// Set Routers
 	customMux.Handle("/", VerifyLoggedIn(index))
@@ -73,17 +100,10 @@ func main() {
 
 	customMux.Handle("/favicon.ico", http.NotFoundHandler())
 
-	// customMux.HandleFunc("/test", func (w http.ResponseWriter, r *http.Request) {
-	// 	VerifyLoggedIn(w, r, conn)
-	// }).Method("GET")
-
-	// customMux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
-
-	// })
-
 	// changes - now support https
-	if err := http.ListenAndServeTLS(":5221", "cert/cert.pem", "cert/key.pem", customMux); err != nil {
-		log.Fatal(err.Error())
+	if err := http.ListenAndServeTLS(":8080", "cert/cert.pem", "cert/key.pem", customMux); err != nil {
+
+		Error.Fatal(err.Error())
 	}
 
 }

@@ -13,9 +13,9 @@ type Index struct {
 	Tpl *template.Template
 }
 
-// Handle Index provide info of already booked appointment
-// Customer will see their list of booked appointment
-// Admin will see the whole entire list (from all customers)
+// Handle Index provide info on already booked appointments
+// Customer will see ONLY THEIR list of booked appointments
+// Admin will see the whole entire list (from ALL customers)
 func (i *Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	cookie, _ := r.Cookie("userInfo")
 
