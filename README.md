@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Installation Guide
 
 This a booking system web app. It provides features for customers to book dental appointments. Below is a summary on how to install locally.
